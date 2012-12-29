@@ -1,0 +1,16 @@
+SPaV - Skeleton Processing and Visualization 
+
+SPaV - проект, предназначенный для обработки и визуализации скелетов изображений.
+
+Структура проекта:
+ - BSTransLib.dll - библиотека скелетизации,
+ - skeletonmaker - оболочка для библиотеки на C++,
+ - skeletonvisualization - визуализатор скелета.
+
+Авторы:
+ BSTransLib.dll - д.т.н. Леонид Моисеевич Местецкий,
+ skeletonmaker - Андрей Вадимович Зимовнов,
+ skeletonvisualization - Олег Павлович Найдин.
+
+Олег Найдин
+ВМК, 2012 год
