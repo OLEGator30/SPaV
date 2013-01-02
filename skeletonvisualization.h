@@ -40,12 +40,13 @@ private:
     void updateImage();
 
 private slots:
-	void openImageButtonClicked();
+    void openImage();
 	void checkBoxesChanged(int);
 	void updateSkeleton();
 	void saveImage();
     void breaksConnector();
     void exitMethod();
+    void setScaleValue(int);
     void scaleOn();
     void scaleOff();
     void scaleOrig();

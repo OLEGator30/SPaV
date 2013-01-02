@@ -1,8 +1,8 @@
 #include "skeletonvisualization.h"
 #include <QMessageBox>
 
-skeletonVisualization::skeletonVisualization(QWidget *parent,
-                             Qt::WFlags flags) : QMainWindow(parent, flags)
+skeletonVisualization::skeletonVisualization(QWidget *parent, Qt::WFlags flags)
+	: QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
 
@@ -10,10 +10,32 @@ skeletonVisualization::skeletonVisualization(QWidget *parent,
 	ui.centralWidget->setLayout(ui.horizontalLayout);
 
     connect(ui.buttonOpen, SIGNAL(clicked()),
-            this, SLOT(openImageButtonClicked()));
+            this, SLOT(openImage()));
     connect(ui.actionOpen, SIGNAL(activated()),
-            this, SLOT(openImageButtonClicked()));
+            this, SLOT(openImage()));
 
+    connect(ui.buttonRefresh, SIGNAL(clicked()),
+            this, SLOT(updateSkeleton()));
+    connect(ui.actionRefresh, SIGNAL(activated()),
+            this, SLOT(updateSkeleton()));
+
+    connect(ui.buttonSave, SIGNAL(clicked()),
+            this, SLOT(saveImage()));
+    connect(ui.actionSave, SIGNAL(activated()),
+            this, SLOT(saveImage()));
+
+    connect(ui.buttonConnect, SIGNAL(clicked()),
+            this, SLOT(breaksConnector()));
+    connect(ui.actionConnect, SIGNAL(activated()),
+            this, SLOT(breaksConnector()));
+
+    connect(ui.buttonQuit, SIGNAL(clicked()),
+            this, SLOT(exitMethod()));
+    connect(ui.actionQuit, SIGNAL(activated()),
+            this, SLOT(exitMethod()));
+
+    connect(ui.sliderScale, SIGNAL(valueChanged(int)),
+            this, SLOT(setScaleValue(int)));
     connect(ui.checkBoxCircles, SIGNAL(stateChanged(int)),
             this, SLOT(checkBoxesChanged(int)));
     connect(ui.checkBoxBones, SIGNAL(stateChanged(int)),
@@ -23,32 +45,11 @@ skeletonVisualization::skeletonVisualization(QWidget *parent,
     connect(ui.checkBoxImage, SIGNAL(stateChanged(int)),
             this, SLOT(checkBoxesChanged(int)));
 
-    connect(ui.buttonRefresh, SIGNAL(clicked()),
-            this, SLOT(updateSkeleton()));
-
-    connect(ui.buttonSave, SIGNAL(clicked()),
-            this, SLOT(saveImage()));
-    connect(ui.actionSave, SIGNAL(activated()),
-            this, SLOT(saveImage()));
-
-    connect(ui.actionConnect, SIGNAL(activated()),
-            this, SLOT(breaksConnector()));
-
-    connect(ui.buttonQuit, SIGNAL(clicked()),
-            this, SLOT(exitMethod()));
-    connect(ui.actionQuit, SIGNAL(activated()),
-            this, SLOT(exitMethod()));
-
-    connect(ui.actionOn, SIGNAL(activated()),
-            this, SLOT(scaleOn()));
-    connect(ui.actionOff, SIGNAL(activated()),
-            this, SLOT(scaleOff()));
-    connect(ui.actionOriginal, SIGNAL(activated()),
-            this, SLOT(scaleOrig()));
-    connect(ui.actionInternal, SIGNAL(activated()),
-            this, SLOT(internal()));
-    connect(ui.actionExternal, SIGNAL(activated()),
-            this, SLOT(external()));
+    connect(ui.actionOn, SIGNAL(activated()), this, SLOT(scaleOn()));
+    connect(ui.actionOff, SIGNAL(activated()), this, SLOT(scaleOff()));
+    connect(ui.actionOriginal, SIGNAL(activated()), this, SLOT(scaleOrig()));
+    connect(ui.actionInternal, SIGNAL(activated()), this, SLOT(internal()));
+    connect(ui.actionExternal, SIGNAL(activated()), this, SLOT(external()));
 
     scene = 0;
     drawCircles = ready = 0;
@@ -92,7 +93,7 @@ void skeletonVisualization::updateImage()
 
         for (uint i = 0; i < skeleton.contours.size(); i++)
         {
-            for (uint j=0; j<skeleton.contours[i].corners.size() - 1; j++)
+            for (uint j = 0; j < skeleton.contours[i].corners.size() - 1; j++)
                 newScene->addLine(
                             scale * skeleton.contours[i].corners[j].x,
                             scale * skeleton.contours[i].corners[j].y,
@@ -117,8 +118,7 @@ void skeletonVisualization::updateImage()
         // draw bones
         if (drawBones)
         {
-            QPen pen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap,
-                     Qt::RoundJoin);
+            QPen pen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
             for (uint j = 0; j < skeleton.components[i].bones.size(); j++)
                 newScene->addLine(
@@ -136,19 +136,18 @@ void skeletonVisualization::updateImage()
         // draw circles
         if (drawCircles)
         {
-            QPen pen(Qt::green, 1, Qt::SolidLine, Qt::RoundCap,
-                     Qt::RoundJoin);
+            QPen pen(Qt::green, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
 
             for (uint j = 0; j < skeleton.components[i].nodes.size(); j++)
-                newScene->addEllipse(scale *
-                                  (skeleton.components[i].nodes[j].x
-                                  + 1 - skeleton.components[i].nodes[j].r),
-                                  scale *
-                                  (skeleton.components[i].nodes[j].y
-                                  + 1 - skeleton.components[i].nodes[j].r),
-                                  2*scale*skeleton.components[i].nodes[j].r,
-                                  2*scale*skeleton.components[i].nodes[j].r,
-                                  pen);
+                newScene->addEllipse(scale * (skeleton.components[i].nodes[j].x
+                                              + 1 - skeleton.components[i].
+                                              nodes[j].r),
+                                     scale * (skeleton.components[i].nodes[j].y
+                                              + 1 - skeleton.components[i].
+                                              nodes[j].r),
+                                     2*scale*skeleton.components[i].nodes[j].r,
+                                     2*scale*skeleton.components[i].nodes[j].r,
+                                     pen);
         }
     }
 
@@ -160,7 +159,7 @@ void skeletonVisualization::updateImage()
     }
 }
 
-void skeletonVisualization::openImageButtonClicked()
+void skeletonVisualization::openImage()
 {
     imagepath = QFileDialog::getOpenFileName(this, "Open image", "",
                                              "Image (*.png *.jpg *.bmp)");
@@ -168,6 +167,7 @@ void skeletonVisualization::openImageButtonClicked()
     {
         ui.buttonSave->setEnabled(true);
         ui.buttonRefresh->setEnabled(true);
+        ui.buttonConnect->setEnabled(true);
         ui.checkBoxBones->setEnabled(true);
         ui.checkBoxImage->setEnabled(true);
         ui.checkBoxContours->setEnabled(true);
@@ -177,6 +177,7 @@ void skeletonVisualization::openImageButtonClicked()
         ui.actionSave->setEnabled(true);
         ui.menuScale->setEnabled(true);
         ui.menuView->setEnabled(true);
+        ui.sliderScale->setEnabled(true);
     }
     if (imagepath.size())
     {
@@ -185,9 +186,9 @@ void skeletonVisualization::openImageButtonClicked()
             QMessageBox msg;
             msg.setWindowTitle("Open new image");
             msg.setText(
-               "Do you want to save the old image before opening new one?");
+                   "Do you want to save the old image before opening new one?");
             msg.setIcon(QMessageBox::Question);
-            msg.setStandardButtons(QMessageBox::Save|QMessageBox::Discard);
+            msg.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
             msg.setDefaultButton(QMessageBox::Discard);
             if (msg.exec() == QMessageBox::Save)
                 saveImage();
@@ -297,15 +298,29 @@ void skeletonVisualization::exitMethod()
         this->close();
 }
 
+void skeletonVisualization::setScaleValue(int val)
+{
+    scale = float(val) / 100;
+    updateImage();
+}
+
 void skeletonVisualization::scaleOn()
 {
-    scale += 0.5;
+    if (scale <= 4.5)
+        scale += 0.5;
+    else
+        scale = 5;
+    ui.sliderScale->setValue(scale * 100);
     updateImage();
 }
 
 void skeletonVisualization::scaleOff()
 {
-    scale -= 0.5;
+    if (scale >= 0.7)
+        scale -= 0.5;
+    else
+        scale = 0.2;
+    ui.sliderScale->setValue(scale * 100);
     updateImage();
 }
 
@@ -314,6 +329,7 @@ void skeletonVisualization::scaleOrig()
     if (scale != 1)
     {
         scale = 1;
+        ui.sliderScale->setValue(100);
         updateImage();
     }
 }

@@ -20,3 +20,6 @@ HEADERS  += skeletonvisualization.h \
     skeletonmaker.h
 
 FORMS    += skeletonvisualization.ui
+
+RESOURCES += \
+    resources.qrc
